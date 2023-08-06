@@ -36,7 +36,7 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public List<Item> findAllByTextRequest(String request) {
-        return items.values().stream().filter(item -> (StringUtils.containsIgnoreCase(item.getName(), request) |
+        return items.values().stream().filter(item -> (StringUtils.containsIgnoreCase(item.getName(), request) ||
                         StringUtils.containsIgnoreCase(item.getDescription(), request) && item.getAvailable()))
                 .collect(Collectors.toList());
     }
