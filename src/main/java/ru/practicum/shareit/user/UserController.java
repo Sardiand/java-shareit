@@ -25,17 +25,17 @@ public class UserController {
             log.error("Ошибка: " + exp.getMessage());
             throw exp;
         }
-        return userServiceImpl.createUser(userDto);
+        return userServiceImpl.create(userDto);
     }
 
     @GetMapping("/{id}")
     public User get(@PathVariable("id") long userId) {
-        return userServiceImpl.getUserById(userId);
+        return userServiceImpl.getById(userId);
     }
 
     @GetMapping
     public List<User> getAll() {
-        return userServiceImpl.getAllUsers();
+        return userServiceImpl.getAll();
     }
 
     @PatchMapping("/{id}")
@@ -45,11 +45,11 @@ public class UserController {
             log.error("Ошибка: " + exp.getMessage());
             throw exp;
         }
-        return userServiceImpl.updateUser(userId, userDto);
+        return userServiceImpl.update(userId, userDto);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") long userId) {
-        userServiceImpl.deleteUserById(userId);
+        userServiceImpl.deleteById(userId);
     }
 }

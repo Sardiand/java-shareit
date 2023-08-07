@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.util.UtilityStuff;
 
 import java.util.List;
 
@@ -24,9 +25,10 @@ public class UserServiceImpl implements UserService {
     private long id = 0;
 
     @Override
-    public User createUser(UserDto userDto) {
+    public User create(UserDto userDto) {
         if (userStorageImpl.checkIsEmailExist(userDto)) {
-            ConflictException exp = new ConflictException("Пользователь с указанным адресом электронной почты уже существует.");
+            ConflictException exp = new ConflictException("Пользователь с адресом электронной почты " +
+                    userDto.getEmail() + " уже существует.");
             log.error("Ошибка: " + exp.getMessage());
             throw exp;
         }
@@ -37,36 +39,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(long userId) {
-        if (userStorageImpl.findById(userId) == null) {
-            BadRequestException exp = new BadRequestException("User с id " + userId + " не найден.");
-            log.error("Ошибка: " + exp.getMessage());
-            throw exp;
-        }
-        return userStorageImpl.findById(userId);
+    public User getById(long userId) {
+        return userStorageImpl.findById(userId).orElseThrow(() ->
+                UtilityStuff.logError(new BadRequestException("User с id " + userId + " не найден.")));
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return userStorageImpl.findAll();
     }
 
     @Override
-    public User updateUser(long userId, UserDto userDto) {
-        if (userStorageImpl.findById(userId) == null) {
-            BadRequestException exp = new BadRequestException("User не найден.");
-            log.error("Ошибка: " + exp.getMessage());
-            throw exp;
-        }
-        User user = userStorageImpl.findById(userId);
+    public User update(long userId, UserDto userDto) {
+        User user = userStorageImpl.findById(userId).orElseThrow(() ->
+                UtilityStuff.logError(new BadRequestException("User с id " + userId + " не найден.")));
         if (userDto.getName() != null) {
             user.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
             if (userStorageImpl.checkIsEmailExist(userDto) &&
-                    !userDto.getEmail().equals(userStorageImpl.findById(userId).getEmail())) {
-                ConflictException exp = new ConflictException("Пользователь с указанным адресом электронной почты" +
-                        " уже существует.");
+                    !userDto.getEmail().equals(userStorageImpl.findById(userId).orElseThrow().getEmail())) {
+                ConflictException exp = new ConflictException("Пользователь с адресом электронной почты " +
+                        userDto.getEmail() + " уже существует.");
                 log.error("Ошибка: " + exp.getMessage());
                 throw exp;
             }
@@ -76,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(long userId) {
+    public void deleteById(long userId) {
         userStorageImpl.deleteById(userId);
         inMemoryItemStorage.deleteAllByUserId(userId);
     }

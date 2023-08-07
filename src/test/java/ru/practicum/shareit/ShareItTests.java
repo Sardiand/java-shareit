@@ -68,7 +68,7 @@ class ShareItTests {
         try {
             userController.addNewUser(userDto);
         } catch (ConflictException exp) {
-            assertEquals("Пользователь с указанным адресом электронной почты уже существует.",
+            assertEquals("Пользователь с адресом электронной почты test@test.com уже существует.",
                     exp.getMessage());
         }
 
@@ -90,7 +90,7 @@ class ShareItTests {
         try {
             userController.update(2, new UserDto("TestName", "update@update.com"));
         } catch (ConflictException exp) {
-            assertEquals("Пользователь с указанным адресом электронной почты уже существует.",
+            assertEquals("Пользователь с адресом электронной почты update@update.com уже существует.",
                     exp.getMessage());
         }
     }

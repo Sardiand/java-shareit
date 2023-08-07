@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.request.InMemoryRequestStorage;
 import ru.practicum.shareit.user.UserStorage;
+import ru.practicum.shareit.util.UtilityStuff;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +29,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper = new ItemMapper(new InMemoryRequestStorage());
 
     @Override
-    public Item createItem(long userId, ItemDto itemDto) {
-        if (inMemoryUserStorage.findById(userId) == null) {
-            throwAndLogException(new NotFoundException("Пользователь с id равным " + userId + " не найден."));
-        }
+    public Item create(long userId, ItemDto itemDto) {
+        inMemoryUserStorage.findById(userId).orElseThrow(() ->
+                UtilityStuff.logError(new NotFoundException("Пользователь с id равным " + userId + " не найден.")));
         Item item = itemMapper.toItem(itemDto);
         item.setOwnerId(userId);
         id++;
@@ -40,45 +40,35 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item updateItem(long userId, long itemId, ItemDto itemDto) {
-        Item item = getItemById(itemId);
-        if (inMemoryUserStorage.findById(userId) == null) {
-            throwAndLogException(new NotFoundException("Пользователь с id равным " + userId + " не найден."));
-        }
+    public Item update(long userId, long itemId, ItemDto itemDto) {
+        Item item = getById(itemId);
+        inMemoryUserStorage.findById(userId).orElseThrow(() ->
+                UtilityStuff.logError(new NotFoundException("Пользователь с id равным " + userId + " не найден.")));
         if (item.getOwnerId() != userId) {
-            throwAndLogException(new ForbiddenException("Изменение полей предмета доступно только опубликовавшему " +
+            throw UtilityStuff.logError(new ForbiddenException("Изменение полей предмета доступно только опубликовавшему " +
                     "его пользователю."));
         }
         return inMemoryItemStorage.edit(itemMapper.changeItemByDTO(item, itemDto));
     }
 
     @Override
-    public Item getItemById(long itemId) {
-        if (inMemoryItemStorage.findById(itemId) == null) {
-            throwAndLogException(new NotFoundException("Предмет с id равным " + itemId + " не найден."));
-        }
-        return inMemoryItemStorage.findById(itemId);
+    public Item getById(long itemId) {
+        return inMemoryItemStorage.findById(itemId).orElseThrow(() ->
+                UtilityStuff.logError(new NotFoundException("Предмет с id равным " + itemId + " не найден.")));
     }
 
     @Override
     public List<Item> getAllUsersItems(long userId) {
-        if (inMemoryUserStorage.findById(userId) == null) {
-            throwAndLogException(new NotFoundException("Пользователь с id равным " + userId + " не найден."));
-        }
+        inMemoryUserStorage.findById(userId).orElseThrow(() ->
+                UtilityStuff.logError(new NotFoundException("Пользователь с id равным " + userId + " не найден.")));
         return inMemoryItemStorage.findAllByUserId(userId);
     }
 
     @Override
-    public List<Item> getAllItemsByTextRequest(String request) {
+    public List<Item> getAllByTextRequest(String request) {
         if (request.isBlank()) {
             return new ArrayList<>();
         }
         return inMemoryItemStorage.findAllByTextRequest(request);
     }
-
-    private void throwAndLogException(RuntimeException exp) {
-        log.error("Ошибка: " + exp.getMessage());
-        throw exp;
-    }
-
 }

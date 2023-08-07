@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -26,18 +27,22 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public List<Item> findAllByUserId(long userId) {
-        return items.values().stream().filter(item -> item.getOwnerId() == userId).collect(Collectors.toList());
+        return items.values().stream()
+                .filter(item -> item.getOwnerId() == userId)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Item findById(long itemId) {
-        return items.get(itemId);
+    public Optional<Item> findById(long itemId) {
+        return Optional.ofNullable(items.get(itemId));
     }
 
     @Override
     public List<Item> findAllByTextRequest(String request) {
-        return items.values().stream().filter(item -> (StringUtils.containsIgnoreCase(item.getName(), request) ||
-                        StringUtils.containsIgnoreCase(item.getDescription(), request))).filter(Item::getAvailable)
+        return items.values().stream()
+                .filter(item -> (StringUtils.containsIgnoreCase(item.getName(), request) ||
+                        StringUtils.containsIgnoreCase(item.getDescription(), request)))
+                .filter(Item::getAvailable)
                 .collect(Collectors.toList());
     }
 

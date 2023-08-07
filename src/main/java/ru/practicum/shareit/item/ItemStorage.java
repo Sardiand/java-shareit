@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemStorage {
@@ -13,7 +14,7 @@ public interface ItemStorage {
 
     List<Item> findAllByUserId(long userId);
 
-    Item findById(long itemId);
+    Optional<Item> findById(long itemId);
 
     List<Item> findAllByTextRequest(String request);
 

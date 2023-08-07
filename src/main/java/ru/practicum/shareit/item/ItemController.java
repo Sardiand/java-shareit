@@ -26,7 +26,7 @@ public class ItemController {
             log.error("Ошибка: " + e.getMessage());
             throw e;
         }
-        return itemServiceImpl.createItem(userId, itemDto);
+        return itemServiceImpl.create(userId, itemDto);
     }
 
     @PatchMapping("/{id}")
@@ -37,12 +37,12 @@ public class ItemController {
             log.error("Ошибка: " + e.getMessage());
             throw e;
         }
-        return itemServiceImpl.updateItem(userId, itemId, itemDto);
+        return itemServiceImpl.update(userId, itemId, itemDto);
     }
 
     @GetMapping("/{id}")
     public Item getItem(@PathVariable("id") long itemId) {
-        return itemServiceImpl.getItemById(itemId);
+        return itemServiceImpl.getById(itemId);
     }
 
     @GetMapping
@@ -52,6 +52,6 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<Item> getAllByTextRequest(@RequestParam(defaultValue = " ") String text) {
-        return itemServiceImpl.getAllItemsByTextRequest(text);
+        return itemServiceImpl.getAllByTextRequest(text);
     }
 }
