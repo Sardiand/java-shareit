@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
@@ -14,7 +13,6 @@ import ru.practicum.shareit.util.UtilityStuff;
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -27,10 +25,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(UserDto userDto) {
         if (userStorageImpl.checkIsEmailExist(userDto)) {
-            ConflictException exp = new ConflictException("Пользователь с адресом электронной почты " +
-                    userDto.getEmail() + " уже существует.");
-            log.error("Ошибка: " + exp.getMessage());
-            throw exp;
+            throw UtilityStuff.logError(new ConflictException("Пользователь с адресом электронной почты " +
+                    userDto.getEmail() + " уже существует."));
         }
         User user = UserMapper.fromUserDto(userDto);
         id++;
@@ -59,10 +55,8 @@ public class UserServiceImpl implements UserService {
         if (userDto.getEmail() != null) {
             if (userStorageImpl.checkIsEmailExist(userDto) &&
                     !userDto.getEmail().equals(userStorageImpl.findById(userId).orElseThrow().getEmail())) {
-                ConflictException exp = new ConflictException("Пользователь с адресом электронной почты " +
-                        userDto.getEmail() + " уже существует.");
-                log.error("Ошибка: " + exp.getMessage());
-                throw exp;
+                throw UtilityStuff.logError(new ConflictException("Пользователь с адресом электронной почты " +
+                        userDto.getEmail() + " уже существует."));
             }
             user.setEmail(userDto.getEmail());
         }
