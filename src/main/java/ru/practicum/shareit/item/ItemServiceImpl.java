@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.comment.Comment;
@@ -24,6 +25,7 @@ import ru.practicum.shareit.util.UtilityStuff;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,7 +77,9 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId).orElseThrow(() ->
                 UtilityStuff.logError(new NotFoundException("Пользователь с id равным " + userId + " не найден.")));
         return itemRepository.findAllByOwner_id(userId)
-                .stream().map(this::makeItemCBDFromItem).collect(Collectors.toList());
+                .stream().map(this::makeItemCBDFromItem)
+                .sorted(Comparator.comparing(ItemCommentBookingDto::getId, Comparator.naturalOrder()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -96,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
                 UtilityStuff.logError(new NotFoundException("Предмет с id равным " + itemId + " не найден.")));
         if (bookingRepository.findPreviousByItemIdAndUserId(itemId, userId, LocalDateTime.now(), Status.APPROVED)
                 .isEmpty()) {
-            throw new ForbiddenException(String.format("Пользователь с id %d не арендовал предмет с id %d, " +
+            throw new BadRequestException(String.format("Пользователь с id %d не арендовал предмет с id %d, " +
                     "в связи с чем не может оставлять комментарии к предмету.", userId, itemId));
         }
         return commentRepository.save(CommentMapper.fromIncomingDto(user, item, incomingCommentDto));

@@ -8,26 +8,24 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findAllByBooker_IdOrderByStartDesc(Long bookerId);
+    List<Booking> findAllByBooker_IdOrderByStartDesc(long userId);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = ?1 " +
             "AND b.start <= ?2 " +
-            "AND b.end >= ?2 " +
+            "AND b.end > ?2 " +
             "ORDER BY b.start DESC")
-    List<Booking> findAllCurrentByBooker_IdOrderByStartDesc(long bookerId, LocalDateTime now);
+    List<Booking> findAllCurrentByBooker_IdOrderByStartDesc(long userId, LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = ?1 " +
-            "AND b.start <= ?2 " +
-            "AND b.end <= ?2 " +
+            "AND b.end < ?2 " +
             "ORDER BY b.start DESC")
     List<Booking> findAllPreviousByBooker_IdOrderByStartDesc(long bookerId, LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = ?1 " +
-            "AND b.start >= ?2 " +
-            "AND b.end >= ?2 " +
+            "AND b.start > ?2 " +
             "ORDER BY b.start DESC")
     List<Booking> findAllUpcomingByBooker_IdOrderByStartDesc(long bookerId, LocalDateTime now);
 
@@ -37,15 +35,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.id IN ?1 " +
-            "AND b.start <= ?2 " +
-            "AND b.end >= ?2 " +
+            "AND b.start < ?2 " +
+            "AND b.end > ?2 " +
             "ORDER BY b.start DESC")
     List<Booking> findAllCurrentByItemIdsInOrderByStartDesc(List<Long> itemIds, LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.id IN ?1 " +
-            "AND b.start <= ?2 " +
-            "AND b.end <= ?2 " +
+            "AND b.start < ?2 " +
+            "AND b.end < ?2 " +
             "ORDER BY b.start DESC")
     List<Booking> findAllPreviousByItemIdsInOrderByStartDesc(List<Long> itemIds, LocalDateTime now);
 
@@ -59,7 +57,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItem_IdInAndStatusOrderByStartDesc(List<Long> itemIds, Status status);
 
     @Query("SELECT b FROM Booking b " +
-            "WHERE b.item.id = ?1" +
+            "WHERE b.item.id = ?1 " +
             "AND b.booker.id = ?2 " +
             "AND b.end <= ?3 " +
             "AND b.status = ?4 " +
@@ -70,14 +68,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT b FROM Booking b " +
             "WHERE b.item.id = ?1 " +
             "AND b.status = ?2 " +
-            "AND b.start <= ?3 " +
+            "AND b.start < ?3 " +
             "ORDER BY b.end DESC")
     List<Booking> findPreviousByItem_id(long itemId, Status status, LocalDateTime now);
 
     @Query(value = "SELECT b FROM Booking b " +
             "WHERE b.item.id = ?1 " +
             "AND b.status = ?2 " +
-            "AND b.start >= ?3 " +
+            "AND b.start > ?3 " +
             "ORDER BY b.start DESC")
     List<Booking> findUpcomingByItem_Id(long itemId, Status status, LocalDateTime now);
 

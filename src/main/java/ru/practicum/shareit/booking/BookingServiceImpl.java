@@ -41,7 +41,8 @@ public class BookingServiceImpl implements BookingService {
             throw UtilityStuff.logError(new BadRequestException("Бронирование вещи с id "
                     + item.getId() + " недоступно"));
         }
-        return bookingRepository.save(BookingMapper.toBooking(bookingDto, user, item));
+        Booking booking = BookingMapper.toBooking(bookingDto, user, item);
+        return bookingRepository.save(booking);
     }
 
     @Override
