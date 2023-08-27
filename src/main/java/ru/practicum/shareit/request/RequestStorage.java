@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RequestStorage {
 
-    ItemRequest add(ItemRequest itemRequest);
+    ItemRequest add(ItemRequest request);
 
     ItemRequest findById(long requestId);
 }

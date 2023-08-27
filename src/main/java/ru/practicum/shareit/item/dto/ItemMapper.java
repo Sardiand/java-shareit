@@ -1,10 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.request.RequestStorage;
+import ru.practicum.shareit.util.UtilityStuff;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -15,28 +14,23 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ItemMapper {
-    @Autowired
-    private final RequestStorage inMemoryRequestStorage;
-    ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-    Validator validator = validatorFactory.getValidator();
 
-    public ItemDto toItemDto(Item item) {
+    public static ItemDto toItemDto(Item item) {
         return new ItemDto(
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getRequest() != null ? item.getRequest().getId() : null
+                null
         );
     }
 
-    public Item toItem(ItemDto itemDto) {
-        Item item = new Item(itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable(),
-                itemDto.getRequest() != null ? inMemoryRequestStorage.findById(itemDto.getRequest()) : null);
-        validateItem(item);
+    public static Item toItem(ItemDto itemDto) {
+        Item item = new Item(itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable());
+        UtilityStuff.validateItem(item);
         return item;
     }
 
-    public Item changeItemByDTO(Item item, ItemDto itemDto) {
+    public static Item changeItemByDTO(Item item, ItemDto itemDto) {
         if (itemDto.getName() != null) {
             item.setName(itemDto.getName());
         }
@@ -47,18 +41,18 @@ public class ItemMapper {
             item.setAvailable(itemDto.getAvailable());
         }
         if (itemDto.getRequest() != null) {
-            item.setRequest(inMemoryRequestStorage.findById(itemDto.getRequest()));
+            item.setRequest(itemDto.getRequest());
         }
-        validateItem(item);
+        UtilityStuff.validateItem(item);
         return item;
     }
 
-    private void validateItem(Item item) {
-        Set<ConstraintViolation<Item>> violations = validator.validate(item);
-        if (!violations.isEmpty()) {
-            String messages = violations.stream().map(ConstraintViolation::getMessage)
-                    .collect(Collectors.joining(", "));
-            throw new BadRequestException(messages);
-        }
+    public static ItemCommentBookingDto toItemCommentBookingDto(Item item) {
+        return new ItemCommentBookingDto(item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                null,
+                null);
     }
 }

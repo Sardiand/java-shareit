@@ -28,7 +28,7 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public List<Item> findAllByUserId(long userId) {
         return items.values().stream()
-                .filter(item -> item.getOwnerId() == userId)
+                .filter(item -> item.getOwner().getId() == userId)
                 .collect(Collectors.toList());
     }
 
@@ -49,7 +49,7 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public void deleteAllByUserId(long userId) {
         for (Item item : List.copyOf(items.values())) {
-            if (item.getOwnerId() == userId) {
+            if (item.getOwner().getId() == userId) {
                 items.remove(item.getId());
             }
         }
