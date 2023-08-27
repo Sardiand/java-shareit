@@ -1,30 +1,8 @@
 package ru.practicum.shareit;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.ConflictException;
-import ru.practicum.shareit.exception.ForbiddenException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.InMemoryItemStorage;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemController;
-import ru.practicum.shareit.item.ItemServiceImpl;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.*;
-import ru.practicum.shareit.user.dto.UserDto;
-
-import static javax.validation.Validation.buildDefaultValidatorFactory;
-import static org.junit.jupiter.api.Assertions.*;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.List;
-
 
 @SpringBootTest
 class ShareItTests {

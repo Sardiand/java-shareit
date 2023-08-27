@@ -1,16 +1,10 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.RequiredArgsConstructor;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.util.UtilityStuff;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @RequiredArgsConstructor
 public class ItemMapper {
