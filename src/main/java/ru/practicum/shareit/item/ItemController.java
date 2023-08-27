@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.item.comment.Comment;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.IncomingCommentDto;
 import ru.practicum.shareit.item.dto.ItemCommentBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -44,8 +44,9 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemCommentBookingDto getItem(@PathVariable("id") long itemId) {
-        return itemServiceImpl.getById(itemId);
+    public ItemCommentBookingDto getItem(@RequestHeader("X-Sharer-User-Id") long userId,
+                                         @PathVariable("id") long itemId) {
+        return itemServiceImpl.getById(userId, itemId);
     }
 
     @GetMapping
@@ -59,9 +60,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public Comment addComment(@RequestHeader("X-Sharer-User-Id") long userId,
-                              @PathVariable long itemId,
-                              @Valid @RequestBody IncomingCommentDto commentDto) {
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId,
+                                 @PathVariable long itemId,
+                                 @Valid @RequestBody IncomingCommentDto commentDto) {
         return itemServiceImpl.createCommentToItem(userId, itemId, commentDto);
     }
 }

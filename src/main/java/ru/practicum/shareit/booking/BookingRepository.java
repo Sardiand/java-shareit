@@ -76,7 +76,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE b.item.id = ?1 " +
             "AND b.status = ?2 " +
             "AND b.start > ?3 " +
-            "ORDER BY b.start DESC")
+            "ORDER BY b.start ASC")
     List<Booking> findUpcomingByItem_Id(long itemId, Status status, LocalDateTime now);
 
 }

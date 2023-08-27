@@ -66,10 +66,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemCommentBookingDto getById(long itemId) {
+    public ItemCommentBookingDto getById(long userId, long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 UtilityStuff.logError(new NotFoundException("Предмет с id равным " + itemId + " не найден.")));
-        return makeItemCBDFromItem(item);
+        return makeItemCBDFromItem(userId, item);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId).orElseThrow(() ->
                 UtilityStuff.logError(new NotFoundException("Пользователь с id равным " + userId + " не найден.")));
         return itemRepository.findAllByOwner_id(userId)
-                .stream().map(this::makeItemCBDFromItem)
+                .stream().map(item -> (makeItemCBDFromItem(userId, item)))
                 .sorted(Comparator.comparing(ItemCommentBookingDto::getId, Comparator.naturalOrder()))
                 .collect(Collectors.toList());
     }
@@ -93,7 +93,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Comment createCommentToItem(long userId, long itemId, IncomingCommentDto incomingCommentDto) {
+    public CommentDto createCommentToItem(long userId, long itemId, IncomingCommentDto incomingCommentDto) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 UtilityStuff.logError(new NotFoundException("Пользователь с id равным " + userId + " не найден.")));
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
@@ -103,23 +103,27 @@ public class ItemServiceImpl implements ItemService {
             throw new BadRequestException(String.format("Пользователь с id %d не арендовал предмет с id %d, " +
                     "в связи с чем не может оставлять комментарии к предмету.", userId, itemId));
         }
-        return commentRepository.save(CommentMapper.fromIncomingDto(user, item, incomingCommentDto));
+        Comment comment = commentRepository.save(CommentMapper.fromIncomingDto(user, item, incomingCommentDto));
+        return CommentMapper.toCommentDto(comment);
     }
 
-    private ItemCommentBookingDto makeItemCBDFromItem(Item item) {
+    private ItemCommentBookingDto makeItemCBDFromItem(long userId, Item item) {
         List<CommentDto> commentsDto = commentRepository.findAllByItemId(item.getId()).stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
         ItemCommentBookingDto itemCBD = ItemMapper.toItemCommentBookingDto(item);
-        List<Booking> bookings = bookingRepository.findPreviousByItem_id(item.getId(),
-                Status.APPROVED, LocalDateTime.now());
-        if (!bookings.isEmpty()) {
-            itemCBD.setLastBooking(BookingMapper.toBookingItemDto(bookings.get(0)));
-        }
-        bookings = bookingRepository.findUpcomingByItem_Id(item.getId(),
-                Status.APPROVED, LocalDateTime.now());
-        if (!bookings.isEmpty()) {
-            itemCBD.setNextBooking(BookingMapper.toBookingItemDto(bookings.get(0)));
+
+        if (userId == item.getOwner().getId()) {
+            List<Booking> bookings = bookingRepository.findPreviousByItem_id(item.getId(),
+                    Status.APPROVED, LocalDateTime.now());
+            if (!bookings.isEmpty()) {
+                itemCBD.setLastBooking(BookingMapper.toBookingItemDto(bookings.get(0)));
+            }
+            bookings = bookingRepository.findUpcomingByItem_Id(item.getId(),
+                    Status.APPROVED, LocalDateTime.now());
+            if (!bookings.isEmpty()) {
+                itemCBD.setNextBooking(BookingMapper.toBookingItemDto(bookings.get(0)));
+            }
         }
         itemCBD.getComments().addAll(commentsDto);
         return itemCBD;
