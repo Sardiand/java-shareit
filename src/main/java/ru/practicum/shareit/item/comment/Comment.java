@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.comment;
 
 import lombok.*;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemCommentQueries;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.CommentItemDto;
 import ru.practicum.shareit.user.User;
@@ -16,9 +15,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @NamedNativeQueries({
-        @NamedNativeQuery(name = "CommentDtos", query = ItemCommentQueries.queryCommentDto,
+        @NamedNativeQuery(name = "CommentDtos", query =
+                "SELECT c.id AS id, c.text AS text, " +
+                        "c.created AS created, u.name AS authorName " +
+                        "FROM Comments AS c " +
+                        "JOIN Users AS u ON c.author_id=u.id " +
+                        "WHERE c.item_id = ?1 " +
+                        "ORDER BY c.created DESC ",
                 resultSetMapping = "CommentDtoMapping"),
-        @NamedNativeQuery(name = "CommentItemDtos", query = ItemCommentQueries.queryCommentItemDto,
+        @NamedNativeQuery(name = "CommentItemDtos", query =
+                "SELECT c.id AS id, c.text AS text, " +
+                        "c.created AS created, u.name AS authorName, c.item_id AS itemID " +
+                        "FROM Comments AS c " +
+                        "JOIN Users AS u ON c.author_id=u.id " +
+                        "WHERE c.item_id IN :id " +
+                        "ORDER BY c.created DESC ",
                 resultSetMapping = "CommentItemDtoMapping")})
 @SqlResultSetMappings({
         @SqlResultSetMapping(name = "CommentDtoMapping", classes = {

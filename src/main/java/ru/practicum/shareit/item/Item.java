@@ -17,10 +17,47 @@ import javax.validation.constraints.Size;
 @Table(name = "items", schema = "public")
 @NamedNativeQueries({
         @NamedNativeQuery(name = "ItemBookingDtos",
-                query = ItemCommentQueries.queryForItemBookingDto,
+                query = "WITH dto AS (SELECT i.id, i.name, i.description, " +
+                        "i.is_available AS available, i.owner_id AS ownerId " +
+                        "FROM items AS i WHERE i.owner_id = ?1), " +
+
+                        "dtolb AS (SELECT dto.*, lb.lastBookingId, " +
+                        "lb.booker_id AS lastBookerId, lb.rank_lb FROM dto " +
+                        "FULL JOIN (SELECT b.id as lastBookingId, b.booker_id, b.item_id, " +
+                        "RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date DESC) " +
+                        "AS rank_lb FROM bookings AS b WHERE b.status = 'APPROVED' " +
+                        "AND b.start_date <= now()) AS lb ON dto.id = lb.item_id) " +
+
+                        "SELECT dtolb.id, dtolb.name, dtolb.description, dtolb.available, dtolb.ownerId, " +
+                        "dtolb.lastBookingId, dtolb.lastBookerId, nb.id AS nextBookingId, " +
+                        "nb.booker_id AS nextBookerId FROM dtolb FULL JOIN (SELECT b.id, b.booker_id, " +
+                        "b.item_id, RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date ASC) AS rank_nb " +
+                        "FROM bookings AS b WHERE b.status = 'APPROVED' AND b.start_date >= now()) AS nb " +
+                        "ON dtolb.id = nb.item_id WHERE (dtolb.rank_lb = 1 OR dtolb.rank_lb IS NULL) " +
+                        "AND (nb.rank_nb = 1 OR nb.rank_nb is NULL) " +
+                        "ORDER BY dtolb.id ASC",
                 resultSetMapping = "ItemBookingDtoMapping"),
+
         @NamedNativeQuery(name = "ItemBDByID",
-                query = ItemCommentQueries.queryForIBDByItemId,
+                query = "WITH dto AS (SELECT i.id, i.name, i.description, " +
+                        "i.is_available AS available, i.owner_id AS ownerId " +
+                        "FROM items AS i WHERE i.id = ?1), " +
+
+                        "dtolb AS (SELECT dto.*, lb.lastBookingId, " +
+                        "lb.booker_id AS lastBookerId, lb.rank_lb FROM dto " +
+                        "FULL JOIN (SELECT b.id as lastBookingId, b.booker_id, b.item_id, " +
+                        "RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date DESC) " +
+                        "AS rank_lb FROM bookings AS b WHERE b.item_id = ?1 AND b.status = 'APPROVED' " +
+                        "AND b.start_date <= now()) AS lb ON dto.id = lb.item_id) " +
+
+                        "SELECT dtolb.id, dtolb.name, dtolb.description, dtolb.available, dtolb.ownerId, " +
+                        "dtolb.lastBookingId, dtolb.lastBookerId, nb.id AS nextBookingId, " +
+                        "nb.booker_id AS nextBookerId FROM dtolb FULL JOIN (SELECT b.id, b.booker_id, " +
+                        "b.item_id, RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date ASC) AS rank_nb " +
+                        "FROM bookings AS b WHERE b.item_id = ?1 AND b.status = 'APPROVED' AND b.start_date >= now()) AS nb " +
+                        "ON dtolb.id = nb.item_id WHERE (dtolb.rank_lb = 1 OR dtolb.rank_lb IS NULL) " +
+                        "AND (nb.rank_nb = 1 OR nb.rank_nb is NULL) " +
+                        "ORDER BY dtolb.id ASC",
                 resultSetMapping = "ItemBookingDtoMapping")})
 @SqlResultSetMapping(name = "ItemBookingDtoMapping", classes = {
         @ConstructorResult(columns = {
