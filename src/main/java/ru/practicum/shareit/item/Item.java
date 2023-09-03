@@ -12,17 +12,15 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import static ru.practicum.shareit.item.ItemCommentQueries.queryForIBDByItemId;
-import static ru.practicum.shareit.item.ItemCommentQueries.queryForItemBookingDto;
 
 @Entity
 @Table(name = "items", schema = "public")
 @NamedNativeQueries({
         @NamedNativeQuery(name = "ItemBookingDtos",
-                query = queryForItemBookingDto,
+                query = ItemCommentQueries.queryForItemBookingDto,
                 resultSetMapping = "ItemBookingDtoMapping"),
         @NamedNativeQuery(name = "ItemBDByID",
-                query = queryForIBDByItemId,
+                query = ItemCommentQueries.queryForIBDByItemId,
                 resultSetMapping = "ItemBookingDtoMapping")})
 @SqlResultSetMapping(name = "ItemBookingDtoMapping", classes = {
         @ConstructorResult(columns = {
