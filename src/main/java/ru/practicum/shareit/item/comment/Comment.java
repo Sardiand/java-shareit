@@ -2,16 +2,46 @@ package ru.practicum.shareit.item.comment;
 
 import lombok.*;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.dto.CommentItemDto;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+
+import static ru.practicum.shareit.item.ItemCommentQueries.queryCommentDto;
+import static ru.practicum.shareit.item.ItemCommentQueries.queryCommentItemDto;
 
 @Entity
 @Table(name = "comments", schema = "public")
 @RequiredArgsConstructor
 @NoArgsConstructor
 @Data
+@NamedNativeQueries({
+        @NamedNativeQuery(name = "CommentDtos", query = queryCommentDto,
+                resultSetMapping = "CommentDtoMapping"),
+        @NamedNativeQuery(name = "CommentItemDtos", query = queryCommentItemDto,
+                resultSetMapping = "CommentItemDtoMapping")})
+@SqlResultSetMappings({
+        @SqlResultSetMapping(name = "CommentDtoMapping", classes = {
+                @ConstructorResult(columns = {
+                        @ColumnResult(name = "id", type = Long.class),
+                        @ColumnResult(name = "text"),
+                        @ColumnResult(name = "created", type = LocalDateTime.class),
+                        @ColumnResult(name = "authorName")
+                },
+                        targetClass = CommentDto.class)
+        }),
+        @SqlResultSetMapping(name = "CommentItemDtoMapping", classes = {
+                @ConstructorResult(columns = {
+                        @ColumnResult(name = "id", type = Long.class),
+                        @ColumnResult(name = "text"),
+                        @ColumnResult(name = "created", type = LocalDateTime.class),
+                        @ColumnResult(name = "authorName"),
+                        @ColumnResult(name = "itemId", type = Long.class)
+                },
+                        targetClass = CommentItemDto.class)
+        })})
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,7 +11,10 @@ public class BookingMapper {
         return new Booking(bookingDto.getStart(), bookingDto.getEnd(), item, user, Status.WAITING);
     }
 
-    public static BookingItemDto toBookingItemDto(Booking booking) {
-        return new BookingItemDto(booking.getId(), booking.getBooker().getId());
+    public static BookingItemDto toBookingItemDto(Long id, Long bookerId) {
+        if (id == null) {
+            return null;
+        }
+        return new BookingItemDto(id, bookerId);
     }
 }

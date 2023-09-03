@@ -7,9 +7,10 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.util.UtilityStuff;
 
 import java.util.List;
+
+import static ru.practicum.shareit.util.UtilityStuff.logError;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
-                UtilityStuff.logError(new NotFoundException("User с id " + userId + " не найден.")));
+                logError(new NotFoundException("User с id " + userId + " не найден.")));
     }
 
     @Override
@@ -38,13 +39,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(long userId, UserDto userDto) {
         User user = userRepository.findById(userId).orElseThrow(() ->
-                UtilityStuff.logError(new NotFoundException("User с id " + userId + " не найден.")));
+                logError(new NotFoundException("User с id " + userId + " не найден.")));
         if (userDto.getName() != null) {
             user.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
         }
+
         return userRepository.save(user);
     }
 
@@ -54,8 +56,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(userId);
             inMemoryItemStorage.deleteAllByUserId(userId);
         } else {
-            throw UtilityStuff.logError(new NotFoundException("User с id " + userId + " не найден."));
+            throw logError(new NotFoundException("User с id " + userId + " не найден."));
         }
-
     }
 }

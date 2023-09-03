@@ -35,23 +35,13 @@ public class BookingController {
 
     @GetMapping
     public List<Booking> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-                                     @RequestParam(defaultValue = "ALL") String state) {
-        try {
-            State convertedState = State.valueOf(state);
-            return bookingService.getAllByUserIdAndState(userId, convertedState);
-        } catch (IllegalArgumentException exp) {
-            throw UtilityStuff.logError(new BadRequestException("Unknown state: " + state));
-        }
+                                     @RequestParam(defaultValue = "ALL") State state) {
+        return bookingService.getAllByUserIdAndState(userId, state);
     }
 
     @GetMapping("/owner")
     public List<Booking> getBookingsForOwnedItems(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                  @RequestParam(defaultValue = "ALL") String state) {
-        try {
-            State convertedState = State.valueOf(state);
-            return bookingService.getAllBookingsOfUsersItemsByUserId(userId, convertedState);
-        } catch (IllegalArgumentException exp) {
-            throw UtilityStuff.logError(new BadRequestException("Unknown state: " + state));
-        }
+                                                  @RequestParam(defaultValue = "ALL") State state) {
+        return bookingService.getAllBookingsOfUsersItemsByUserId(userId, state);
     }
 }
