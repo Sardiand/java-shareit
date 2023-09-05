@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 
@@ -23,8 +24,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Long> findAllItemIdsByUserId(long userId);
 
     @Query(nativeQuery = true, name = "ItemBDByID")
-    Optional<ItemBookingDto> findItemBookingDtoById(long itemId);
+    Optional<ItemBookingDto> findItemBookingDtoById(@Param("id") long itemId);
 
     @Query(nativeQuery = true, name = "ItemBookingDtos")
-    List<ItemBookingDto> findAllItemBookingDto(long userId);
+    List<ItemBookingDto> findAllItemBookingDto(@Param("id") long userId);
 }

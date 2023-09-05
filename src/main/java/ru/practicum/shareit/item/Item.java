@@ -19,45 +19,48 @@ import javax.validation.constraints.Size;
         @NamedNativeQuery(name = "ItemBookingDtos",
                 query = "WITH dto AS (SELECT i.id, i.name, i.description, " +
                         "i.is_available AS available, i.owner_id AS ownerId " +
-                        "FROM items AS i WHERE i.owner_id = ?1), " +
+                        "FROM items AS i), " +
 
                         "dtolb AS (SELECT dto.*, lb.lastBookingId, " +
                         "lb.booker_id AS lastBookerId, lb.rank_lb FROM dto " +
-                        "FULL JOIN (SELECT b.id as lastBookingId, b.booker_id, b.item_id, " +
+                        "LEFT JOIN (SELECT b.id as lastBookingId, b.booker_id, b.item_id, " +
                         "RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date DESC) " +
                         "AS rank_lb FROM bookings AS b WHERE b.status = 'APPROVED' " +
-                        "AND b.start_date <= now()) AS lb ON dto.id = lb.item_id) " +
+                        "AND b.start_date <= CURRENT_TIMESTAMP) AS lb ON dto.id = lb.item_id " +
+                        "WHERE lb.rank_lb = 1 OR lb.rank_lb IS NULL), " +
 
-                        "SELECT dtolb.id, dtolb.name, dtolb.description, dtolb.available, dtolb.ownerId, " +
+                        "itemdto AS (SELECT dtolb.id, dtolb.name, dtolb.description, dtolb.available, dtolb.ownerId, " +
                         "dtolb.lastBookingId, dtolb.lastBookerId, nb.id AS nextBookingId, " +
-                        "nb.booker_id AS nextBookerId FROM dtolb FULL JOIN (SELECT b.id, b.booker_id, " +
+                        "nb.booker_id AS nextBookerId FROM dtolb LEFT JOIN (SELECT b.id, b.booker_id, " +
                         "b.item_id, RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date ASC) AS rank_nb " +
-                        "FROM bookings AS b WHERE b.status = 'APPROVED' AND b.start_date >= now()) AS nb " +
-                        "ON dtolb.id = nb.item_id WHERE (dtolb.rank_lb = 1 OR dtolb.rank_lb IS NULL) " +
-                        "AND (nb.rank_nb = 1 OR nb.rank_nb is NULL) " +
-                        "ORDER BY dtolb.id ASC",
+                        "FROM bookings AS b WHERE b.status = 'APPROVED' AND b.start_date >= CURRENT_TIMESTAMP) AS nb " +
+                        "ON dtolb.id = nb.item_id WHERE nb.rank_nb = 1 OR nb.rank_nb IS NULL) " +
+
+                        "SELECT * FROM itemdto WHERE itemdto.ownerId = :id ORDER BY itemdto.id ASC",
                 resultSetMapping = "ItemBookingDtoMapping"),
 
         @NamedNativeQuery(name = "ItemBDByID",
                 query = "WITH dto AS (SELECT i.id, i.name, i.description, " +
                         "i.is_available AS available, i.owner_id AS ownerId " +
-                        "FROM items AS i WHERE i.id = ?1), " +
+                        "FROM items AS i), " +
 
                         "dtolb AS (SELECT dto.*, lb.lastBookingId, " +
                         "lb.booker_id AS lastBookerId, lb.rank_lb FROM dto " +
-                        "FULL JOIN (SELECT b.id as lastBookingId, b.booker_id, b.item_id, " +
+                        "LEFT JOIN (SELECT b.id as lastBookingId, b.booker_id, b.item_id, " +
                         "RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date DESC) " +
-                        "AS rank_lb FROM bookings AS b WHERE b.item_id = ?1 AND b.status = 'APPROVED' " +
-                        "AND b.start_date <= now()) AS lb ON dto.id = lb.item_id) " +
+                        "AS rank_lb FROM bookings AS b WHERE b.status = 'APPROVED' " +
+                        "AND b.start_date <= CURRENT_TIMESTAMP) AS lb ON dto.id = lb.item_id " +
+                        "WHERE lb.rank_lb = 1 OR lb.rank_lb IS NULL), " +
 
-                        "SELECT dtolb.id, dtolb.name, dtolb.description, dtolb.available, dtolb.ownerId, " +
+                        "itemdto AS (SELECT dtolb.id, dtolb.name, dtolb.description, dtolb.available, dtolb.ownerId, " +
                         "dtolb.lastBookingId, dtolb.lastBookerId, nb.id AS nextBookingId, " +
-                        "nb.booker_id AS nextBookerId FROM dtolb FULL JOIN (SELECT b.id, b.booker_id, " +
+                        "nb.booker_id AS nextBookerId FROM dtolb LEFT JOIN (SELECT b.id, b.booker_id, " +
                         "b.item_id, RANK () OVER (PARTITION BY b.item_id ORDER BY b.start_date ASC) AS rank_nb " +
-                        "FROM bookings AS b WHERE b.item_id = ?1 AND b.status = 'APPROVED' AND b.start_date >= now()) AS nb " +
-                        "ON dtolb.id = nb.item_id WHERE (dtolb.rank_lb = 1 OR dtolb.rank_lb IS NULL) " +
-                        "AND (nb.rank_nb = 1 OR nb.rank_nb is NULL) " +
-                        "ORDER BY dtolb.id ASC",
+                        "FROM bookings AS b WHERE b.status = 'APPROVED' " +
+                        "AND b.start_date >= CURRENT_TIMESTAMP) AS nb ON dtolb.id = nb.item_id " +
+                        "WHERE nb.rank_nb = 1 OR nb.rank_nb IS NULL) " +
+
+                        "SELECT * FROM itemdto WHERE itemdto.id = :id ORDER BY itemdto.id ASC",
                 resultSetMapping = "ItemBookingDtoMapping")})
 @SqlResultSetMapping(name = "ItemBookingDtoMapping", classes = {
         @ConstructorResult(columns = {
