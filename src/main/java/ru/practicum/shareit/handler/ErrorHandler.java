@@ -1,5 +1,7 @@
 package ru.practicum.shareit.handler;
 
+import org.postgresql.util.PSQLException;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -21,9 +23,9 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({ConflictException.class, PSQLException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictException(final ConflictException e) {
+    public ErrorResponse handleConflictException(final Exception e) {
         return new ErrorResponse(e.getMessage());
     }
 
@@ -38,4 +40,11 @@ public class ErrorHandler {
     public ErrorResponse handleForbiddenException(final ForbiddenException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConversionFailedException(final ConversionFailedException e) {
+        return new ErrorResponse("Unknown state: " + e.getValue());
+    }
+
 }
