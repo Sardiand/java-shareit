@@ -21,14 +21,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ItemRequestServiceImpl implements ItemRequestService{
+public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
     @Override
     public ItemRequestDto create(long userId, IncomingItemRequestDto dto) {
-       User user = userRepository.findById(userId).orElseThrow(() ->
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 logError(new NotFoundException("User с id " + userId + " не найден.")));
         ItemRequest request = itemRequestRepository.save(toItemRequest(user, dto));
         return toItemRequestDto(request);
@@ -69,7 +69,7 @@ public class ItemRequestServiceImpl implements ItemRequestService{
                 logError(new NotFoundException("User с id " + requesterId + " не найден.")));
         Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by("created").descending());
         List<ItemRequestDto> dtos = itemRequestRepository.findAllByRequesterId(requesterId, pageable);
-        if(dtos.isEmpty()) {
+        if (dtos.isEmpty()) {
             return new ArrayList<>();
         } else {
             List<ItemDto> items = itemRepository.findAllByRequesterId(requesterId);
