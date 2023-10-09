@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -12,7 +15,6 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,68 +82,71 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllByUserIdAndState(long userId, State state) {
+    public List<Booking> getAllByUserIdAndState(long userId, State state, int from, int size) {
         throwExceptionIfUserNotExist(userId);
         List<Booking> bookings = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by("start").descending());
+
         switch (state) {
             case ALL:
-                bookings = new ArrayList<>(bookingRepository.findAllByBooker_IdOrderByStartDesc(userId));
+                bookings = new ArrayList<>(bookingRepository.findAllByBooker_IdOrderByStartDesc(userId, pageable));
                 break;
             case CURRENT:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllCurrentByBookerId(userId, LocalDateTime.now()));
+                        .findAllCurrentByBookerId(userId, pageable));
                 break;
             case PAST:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllPreviousByBookerId(userId, LocalDateTime.now()));
+                        .findAllPreviousByBookerId(userId, pageable));
                 break;
             case FUTURE:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllUpcomingByBookerId(userId, LocalDateTime.now()));
+                        .findAllUpcomingByBookerId(userId, pageable));
                 break;
             case WAITING:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllByBooker_IdAndStatusOrderByStartDesc(userId, Status.WAITING));
+                        .findAllByBooker_IdAndStatusOrderByStartDesc(userId, Status.WAITING, pageable));
                 break;
             case REJECTED:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllByBooker_IdAndStatusOrderByStartDesc(userId, Status.REJECTED));
+                        .findAllByBooker_IdAndStatusOrderByStartDesc(userId, Status.REJECTED, pageable));
                 break;
         }
         return bookings;
     }
 
     @Override
-    public List<Booking> getAllBookingsOfUsersItemsByUserId(long userId, State state) {
+    public List<Booking> getAllBookingsOfUsersItemsByUserId(long userId, State state, int from, int size) {
         throwExceptionIfUserNotExist(userId);
         List<Long> itemIds = new ArrayList<>(itemRepository.findAllItemIdsByUserId(userId));
         List<Booking> bookings = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by("start").descending());
         if (itemIds.isEmpty()) {
             return new ArrayList<>();
         }
         switch (state) {
             case ALL:
-                bookings = new ArrayList<>(bookingRepository.findAllByItem_IdInOrderByStartDesc(itemIds));
+                bookings = new ArrayList<>(bookingRepository.findAllByItem_IdInOrderByStartDesc(itemIds, pageable));
                 break;
             case CURRENT:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllCurrentByItemIds(itemIds, LocalDateTime.now()));
+                        .findAllCurrentByItemIds(itemIds, pageable));
                 break;
             case PAST:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllPreviousByItemIds(itemIds, LocalDateTime.now()));
+                        .findAllPreviousByItemIds(itemIds, pageable));
                 break;
             case FUTURE:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllUpcomingByItemIds(itemIds, LocalDateTime.now()));
+                        .findAllUpcomingByItemIds(itemIds, pageable));
                 break;
             case WAITING:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllByItem_IdInAndStatusOrderByStartDesc(itemIds, Status.WAITING));
+                        .findAllByItem_IdInAndStatusOrderByStartDesc(itemIds, Status.WAITING, pageable));
                 break;
             case REJECTED:
                 bookings = new ArrayList<>(bookingRepository
-                        .findAllByItem_IdInAndStatusOrderByStartDesc(itemIds, Status.REJECTED));
+                        .findAllByItem_IdInAndStatusOrderByStartDesc(itemIds, Status.REJECTED, pageable));
                 break;
         }
         return bookings;

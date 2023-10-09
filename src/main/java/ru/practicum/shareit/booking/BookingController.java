@@ -1,16 +1,19 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
+@Validated
 public class BookingController {
     private final BookingService bookingService;
 
@@ -33,13 +36,17 @@ public class BookingController {
 
     @GetMapping
     public List<Booking> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-                                     @RequestParam(defaultValue = "ALL") State state) {
-        return bookingService.getAllByUserIdAndState(userId, state);
+                                     @RequestParam(defaultValue = "ALL") State state,
+                                     @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                     @RequestParam(defaultValue = "20") @Min(1) Integer size) {
+        return bookingService.getAllByUserIdAndState(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<Booking> getBookingsForOwnedItems(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                  @RequestParam(defaultValue = "ALL") State state) {
-        return bookingService.getAllBookingsOfUsersItemsByUserId(userId, state);
+                                                  @RequestParam(defaultValue = "ALL") State state,
+                                                  @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                                  @RequestParam(defaultValue = "20") @Min(1) Integer size) {
+        return bookingService.getAllBookingsOfUsersItemsByUserId(userId, state, from, size);
     }
 }

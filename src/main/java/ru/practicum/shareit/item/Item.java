@@ -1,10 +1,10 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
@@ -61,8 +61,30 @@ import javax.validation.constraints.Size;
                         "WHERE nb.rank_nb = 1 OR nb.rank_nb IS NULL) " +
 
                         "SELECT * FROM itemdto WHERE itemdto.id = :id ORDER BY itemdto.id ASC",
-                resultSetMapping = "ItemBookingDtoMapping")})
-@SqlResultSetMapping(name = "ItemBookingDtoMapping", classes = {
+                resultSetMapping = "ItemBookingDtoMapping"),
+
+        @NamedNativeQuery(name = "ItemForRequestDtosById",
+                query = "SELECT i.id, i.name, i.description, " +
+                        "i.is_available AS available, i.request_id AS requestId " +
+                        "FROM items AS i WHERE i.request_id = :id ORDER BY i.id ASC",
+                resultSetMapping = "ItemForRequestDtoMapping"),
+
+        @NamedNativeQuery(name = "ItemForRequestDtosAll",
+                query = "SELECT i.id, i.name, i.description, " +
+                        "i.is_available AS available, i.request_id AS requestId " +
+                        "FROM items AS i LEFT JOIN requests AS r ON i.request_id = r.id " +
+                        "WHERE i.request_id IS NOT NULL " +
+                        "AND r.requester_id != :id ORDER BY i.id ASC",
+                resultSetMapping = "ItemForRequestDtoMapping"),
+
+        @NamedNativeQuery(name = "ItemForRequestDtosByRequester",
+                query = "SELECT i.id, i.name, i.description, " +
+                        "i.is_available AS available, i.request_id AS requestId " +
+                        "FROM items AS i LEFT JOIN requests AS r ON i.request_id = r.id " +
+                        "WHERE r.requester_id = :id ORDER BY i.id ASC",
+                resultSetMapping = "ItemForRequestDtoMapping")
+})
+@SqlResultSetMappings({@SqlResultSetMapping(name = "ItemBookingDtoMapping", classes = {
         @ConstructorResult(columns = {
                 @ColumnResult(name = "id", type = Long.class),
                 @ColumnResult(name = "name"),
@@ -74,9 +96,18 @@ import javax.validation.constraints.Size;
                 @ColumnResult(name = "nextBookingId", type = Long.class),
                 @ColumnResult(name = "nextBookerId", type = Long.class)},
                 targetClass = ItemBookingDto.class)
+}),
+        @SqlResultSetMapping(name = "ItemForRequestDtoMapping", classes = {
+                @ConstructorResult(columns = {
+                        @ColumnResult(name = "id", type = Long.class),
+                        @ColumnResult(name = "name"),
+                        @ColumnResult(name = "description"),
+                        @ColumnResult(name = "available", type = boolean.class),
+                        @ColumnResult(name = "requestId", type = Long.class)},
+                        targetClass = ItemDto.class)
+        })
 })
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Item {
     @Id
@@ -104,9 +135,10 @@ public class Item {
     @JoinColumn(name = "request_id")
     private ItemRequest request;
 
-    public Item(@NonNull String name, @NonNull String description, @NonNull Boolean isAvailable) {
+    public Item(@NonNull String name, @NonNull String description, @NonNull Boolean isAvailable, ItemRequest request) {
         this.name = name;
         this.description = description;
         this.available = isAvailable;
+        this.request = request;
     }
 }
