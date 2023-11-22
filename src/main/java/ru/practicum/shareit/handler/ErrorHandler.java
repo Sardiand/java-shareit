@@ -1,5 +1,6 @@
 package ru.practicum.shareit.handler;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.postgresql.util.PSQLException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler({ConflictException.class, PSQLException.class})
+    @ExceptionHandler({ConflictException.class, PSQLException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflictException(final Exception e) {
         return new ErrorResponse(e.getMessage());

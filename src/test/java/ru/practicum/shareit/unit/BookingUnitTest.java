@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class UnitTest {
+public class BookingUnitTest {
 
     @InjectMocks
     private BookingServiceImpl bookingService;

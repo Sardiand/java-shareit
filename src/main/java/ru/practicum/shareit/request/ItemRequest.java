@@ -1,5 +1,7 @@
 package ru.practicum.shareit.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
 @Table(name = "requests", schema = "public")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @NamedNativeQueries({@NamedNativeQuery(name = "ItemRequestDtosAll", query =
         "SELECT r.id, r.description, r.created " +
                 "FROM requests AS r WHERE r.requester_id != :id ORDER BY r.created DESC ",

@@ -107,4 +107,10 @@ public class ItemMapper {
                 })
                 .collect(Collectors.toList());
     }
+
+    public static ItemBookingDto toItemBookingDto(Item item, long userId) {
+        return new ItemBookingDto(item.getId(),
+                item.getName(), item.getDescription(), item.getAvailable(), userId,
+                null, null, null, null);
+    }
 }

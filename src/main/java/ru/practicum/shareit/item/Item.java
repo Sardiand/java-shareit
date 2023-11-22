@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.ItemRequest;
@@ -109,6 +107,8 @@ import javax.validation.constraints.Size;
 })
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
