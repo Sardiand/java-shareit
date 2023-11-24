@@ -44,7 +44,7 @@ public class BookingRepositoryTest {
 
         item = new Item("Грааль", "Святой", true, null);
         item.setOwner(owner);
-        itemRepository.save(item);
+        item = itemRepository.save(item);
 
         booking = new Booking();
         booking.setItem(item);
@@ -146,7 +146,7 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    void findLastBookingList() {
+    void findAllPrevious() {
         booking.setStart(LocalDateTime.now().minusHours(2));
         booking.setEnd(LocalDateTime.now().minusHours(1));
         bookingRepository.save(booking);
@@ -162,7 +162,7 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    void findNextBookingList() {
+    void findAllUpcoming() {
         booking.setStart(LocalDateTime.now().plusHours(2));
         booking.setEnd(LocalDateTime.now().plusDays(1));
         bookingRepository.save(booking);
@@ -170,6 +170,31 @@ public class BookingRepositoryTest {
         List<Booking> bookings = bookingRepository.findAllUpcomingByItemIds(List.of(item.getId()), pageable);
 
         assertEquals(1, bookings.size());
+        assertEquals(booking.getStart(), bookings.get(0).getStart());
+        assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        assertEquals(booking.getBooker().getId(), bookings.get(0).getBooker().getId());
+        assertEquals(booking.getStatus(), bookings.get(0).getStatus());
+    }
+
+    @Test
+    void findAllByBookerId() {
+        booking.setStart(LocalDateTime.now());
+        booking.setEnd(LocalDateTime.now().plusHours(3));
+        bookingRepository.save(booking);
+
+        Booking secondBooking = new Booking();
+        secondBooking.setItem(item);
+        secondBooking.setBooker(booker);
+        secondBooking.setStatus(Status.APPROVED);
+
+        secondBooking.setStart(LocalDateTime.now().minusDays(3));
+        secondBooking.setEnd(LocalDateTime.now().minusDays(1));
+        bookingRepository.save(secondBooking);
+
+        List<Booking> bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(booker.getId(), pageable);
+
+        assertEquals(2, bookings.size());
         assertEquals(booking.getStart(), bookings.get(0).getStart());
         assertEquals(booking.getEnd(), bookings.get(0).getEnd());
         assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());

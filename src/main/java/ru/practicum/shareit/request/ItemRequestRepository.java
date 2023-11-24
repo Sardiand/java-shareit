@@ -20,5 +20,5 @@ public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> 
     List<ItemRequestDto> findAllByRequesterId(@Param("id") long userId, Pageable pageable);
 
     @Query(nativeQuery = true, name = "ItemRequestDtosById")
-    Optional<ItemRequestDto> findById(@Param("id") long userId);
+    Optional<ItemRequestDto> findDTOById(@Param("id") long id);
 }

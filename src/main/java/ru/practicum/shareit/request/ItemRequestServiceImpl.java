@@ -38,7 +38,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto getById(long userId, long requestId) {
         userRepository.findById(userId).orElseThrow(() ->
                 logError(new NotFoundException("User с id " + userId + " не найден.")));
-        ItemRequestDto dto = itemRequestRepository.findById(requestId).orElseThrow(() ->
+        ItemRequestDto dto = itemRequestRepository.findDTOById(requestId).orElseThrow(() ->
                 logError(new NotFoundException("Запрос с id " + requestId + " не найден.")));
         dto.getItems().addAll(itemRepository.findAllByRequestId(requestId));
 
