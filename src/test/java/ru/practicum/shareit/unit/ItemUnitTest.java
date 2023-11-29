@@ -106,8 +106,8 @@ public class ItemUnitTest {
         BadRequestException exp = assertThrows(BadRequestException.class, () ->
                 itemService.createCommentToItem(1L, 1L, null));
         assertEquals(String.format("Пользователь с id %d не арендовал предмет с id %d, " +
-                        "в связи с чем не может оставлять комментарии к предмету.", user.getId(), item.getId())
-                , exp.getMessage());
+                        "в связи с чем не может оставлять комментарии к предмету.", user.getId(), item.getId()),
+                exp.getMessage());
         verify(commentRepository, never()).save(new Comment());
     }
 
