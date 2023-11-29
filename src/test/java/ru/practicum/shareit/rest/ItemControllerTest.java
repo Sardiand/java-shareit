@@ -44,7 +44,7 @@ public class ItemControllerTest {
     private final ItemCommentBookingDto dto = new ItemCommentBookingDto(1L, "Грааль", "Святой+",
             true, new BookingItemDto(1L, 1L), new BookingItemDto(2L, 1L));
     private final CommentDto commentDto = new CommentDto(1L, "Божественно", LocalDateTime.now(),
-            "Миша");
+            "Мишаня");
 
     @Test
     @SneakyThrows
@@ -146,6 +146,17 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())))
                 .andExpect(jsonPath("$.available", is(itemDto.getAvailable())));
+    }
+
+    @Test
+    @SneakyThrows
+    void updateItemWithNull() {
+        mvc.perform(patch("/items/{itemId}", 1)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(null)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

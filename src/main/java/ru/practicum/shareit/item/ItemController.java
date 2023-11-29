@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.dto.IncomingCommentDto;
 import ru.practicum.shareit.item.dto.ItemCommentBookingDto;
@@ -27,22 +26,13 @@ public class ItemController {
     @PostMapping
     public ItemDto addNewItem(@RequestHeader("X-Sharer-User-Id") long userId,
                               @Valid @RequestBody ItemDto itemDto) {
-        if (itemDto == null) {
-            BadRequestException e = new BadRequestException("Передаваемый itemDto не может быть null.");
-            log.error("Ошибка: " + e.getMessage());
-            throw e;
-        }
         return itemServiceImpl.create(userId, itemDto);
     }
 
     @PatchMapping("/{id}")
     public ItemDto changeItem(@RequestHeader("X-Sharer-User-Id") long userId,
                               @Valid @RequestBody ItemDto itemDto, @PathVariable("id") long itemId) {
-        if (itemDto == null) {
-            BadRequestException e = new BadRequestException("Передаваемый itemDto не может быть null.");
-            log.error("Ошибка: " + e.getMessage());
-            throw e;
-        }
+
         return itemServiceImpl.update(userId, itemId, itemDto);
     }
 

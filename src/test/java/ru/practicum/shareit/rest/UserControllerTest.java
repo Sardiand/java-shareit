@@ -67,8 +67,19 @@ class UserControllerTest {
 
     @Test
     @SneakyThrows
-    void addUser_whenUserNotValid() {
+    void addUser_WhenUserNotValid() {
+        mockMvc.perform(post("/users")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(invalidDto)))
+                .andExpect(status().isBadRequest());
 
+        verify(userService, never()).create(any(UserDto.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void addUser_WhenIsNull() {
         mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)

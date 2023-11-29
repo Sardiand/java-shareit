@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
@@ -20,11 +19,6 @@ public class UserController {
 
     @PostMapping
     public User addNewUser(@Valid @RequestBody UserDto userDto) {
-        if (userDto == null) {
-            BadRequestException exp = new BadRequestException("User не может быть null");
-            log.error("Ошибка: " + exp.getMessage());
-            throw exp;
-        }
         return userServiceImpl.create(userDto);
     }
 
@@ -40,11 +34,6 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public User update(@PathVariable("id") long userId, @Valid @RequestBody UserDto userDto) {
-        if (userDto == null) {
-            BadRequestException exp = new BadRequestException("User не может быть null");
-            log.error("Ошибка: " + exp.getMessage());
-            throw exp;
-        }
         return userServiceImpl.update(userId, userDto);
     }
 
