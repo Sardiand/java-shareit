@@ -28,18 +28,19 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto create(long userId, IncomingItemRequestDto dto) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                logError(new NotFoundException("User с id " + userId + " не найден.")));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> logError(new NotFoundException("User с id " + userId + " не найден.")));
         ItemRequest request = itemRequestRepository.save(toItemRequest(user, dto));
+
         return toItemRequestDto(request);
     }
 
     @Override
     public ItemRequestDto getById(long userId, long requestId) {
-        userRepository.findById(userId).orElseThrow(() ->
-                logError(new NotFoundException("User с id " + userId + " не найден.")));
-        ItemRequestDto dto = itemRequestRepository.findDTOById(requestId).orElseThrow(() ->
-                logError(new NotFoundException("Запрос с id " + requestId + " не найден.")));
+        userRepository.findById(userId)
+                .orElseThrow(() -> logError(new NotFoundException("User с id " + userId + " не найден.")));
+        ItemRequestDto dto = itemRequestRepository.findDTOById(requestId)
+                .orElseThrow(() -> logError(new NotFoundException("Запрос с id " + requestId + " не найден.")));
         dto.getItems().addAll(itemRepository.findAllByRequestId(requestId));
 
         return dto;
@@ -47,17 +48,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAll(long userId, int from, int size) {
-        userRepository.findById(userId).orElseThrow(() ->
-                logError(new NotFoundException("User с id " + userId + " не найден.")));
+        userRepository.findById(userId)
+                .orElseThrow(() -> logError(new NotFoundException("User с id " + userId + " не найден.")));
         Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by("created").descending());
         List<ItemRequestDto> dtos = itemRequestRepository.findAllItemRequestDto(userId, pageable);
         if (dtos.isEmpty()) {
             return new ArrayList<>();
-        } else {
-            List<ItemDto> items = itemRepository.findAllWithRequestId(userId);
-            if (!items.isEmpty()) {
-                fillItemRequestDto(dtos, items);
-            }
+        }
+
+        List<ItemDto> items = itemRepository.findAllWithRequestId(userId);
+        if (!items.isEmpty()) {
+            fillItemRequestDto(dtos, items);
+
         }
 
         return dtos;
@@ -65,17 +67,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAllByRequesterId(long requesterId, int from, int size) {
-        userRepository.findById(requesterId).orElseThrow(() ->
-                logError(new NotFoundException("User с id " + requesterId + " не найден.")));
+        userRepository.findById(requesterId)
+                .orElseThrow(() -> logError(new NotFoundException("User с id " + requesterId + " не найден.")));
         Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by("created").descending());
         List<ItemRequestDto> dtos = itemRequestRepository.findAllByRequesterId(requesterId, pageable);
         if (dtos.isEmpty()) {
             return new ArrayList<>();
-        } else {
-            List<ItemDto> items = itemRepository.findAllByRequesterId(requesterId);
-            if (!items.isEmpty()) {
-                fillItemRequestDto(dtos, items);
-            }
+        }
+        List<ItemDto> items = itemRepository.findAllByRequesterId(requesterId);
+        if (!items.isEmpty()) {
+            fillItemRequestDto(dtos, items);
         }
 
         return dtos;
