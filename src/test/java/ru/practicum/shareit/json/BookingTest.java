@@ -40,8 +40,8 @@ public class BookingTest {
                 .satisfies((number -> assertThat(number.longValue()).isEqualTo(booking.getId())));
         assertThat(result).extractingJsonPathStringValue("$.start")
                 .isEqualTo(booking.getStart().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        assertThat(result).extractingJsonPathStringValue("$.end").
-                isEqualTo(booking.getEnd().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        assertThat(result).extractingJsonPathStringValue("$.end")
+                .isEqualTo(booking.getEnd().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         assertThat(result).extractingJsonPathNumberValue("$.item.id")
                 .satisfies((number -> assertThat(number.longValue()).isEqualTo(booking.getItem().getId())));
         assertThat(result).extractingJsonPathStringValue("$.item.name")
