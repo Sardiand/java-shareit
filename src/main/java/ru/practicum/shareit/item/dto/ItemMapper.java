@@ -18,16 +18,19 @@ public class ItemMapper {
 
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
+                item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                null
+                item.getRequest() != null ? item.getRequest().getId() : null
         );
     }
 
     public static Item toItem(ItemDto itemDto) {
-        Item item = new Item(itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable());
+        Item item = new Item(itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable(),
+                null);
         UtilityStuff.validateItem(item);
+
         return item;
     }
 
@@ -41,16 +44,13 @@ public class ItemMapper {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
-        if (itemDto.getRequest() != null) {
-            item.setRequest(itemDto.getRequest());
-        }
         UtilityStuff.validateItem(item);
+
         return item;
     }
 
     public static ItemCommentBookingDto toItemCommentBookingDto(long userId, ItemBookingDto itemBookingDto,
                                                                 List<CommentDto> commentDtos) {
-
         ItemCommentBookingDto itemCommentBookingDto = new ItemCommentBookingDto(itemBookingDto.getId(),
                 itemBookingDto.getName(),
                 itemBookingDto.getDescription(),
@@ -102,8 +102,15 @@ public class ItemMapper {
                                 null);
                     }
                     itemCommentBookingDto.getComments().addAll(comments);
+
                     return itemCommentBookingDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public static ItemBookingDto toItemBookingDto(Item item, long userId) {
+        return new ItemBookingDto(item.getId(),
+                item.getName(), item.getDescription(), item.getAvailable(), userId,
+                null, null, null, null);
     }
 }

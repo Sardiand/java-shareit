@@ -10,9 +10,8 @@ import javax.validation.constraints.NotBlank;
 @Entity
 @Table(name = "users", schema = "public")
 @Data
-@RequiredArgsConstructor
-@NoArgsConstructor
 @Validated
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -27,5 +26,8 @@ public class User {
     @Email(message = "Неверный формат адреса электронной почты.")
     private String email;
 
-
+    public User(@NonNull String name, @NonNull String email) {
+        this.name = name;
+        this.email = email;
+    }
 }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 
@@ -17,8 +16,6 @@ import static ru.practicum.shareit.util.UtilityStuff.logError;
 public class UserServiceImpl implements UserService {
     @Autowired
     private final UserRepository userRepository;
-    @Autowired
-    private final ItemStorage inMemoryItemStorage;
 
     @Override
     public User create(UserDto userDto) {
@@ -54,7 +51,6 @@ public class UserServiceImpl implements UserService {
     public void deleteById(long userId) {
         if (userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
-            inMemoryItemStorage.deleteAllByUserId(userId);
         } else {
             throw logError(new NotFoundException("User с id " + userId + " не найден."));
         }

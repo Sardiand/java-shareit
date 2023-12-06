@@ -11,15 +11,15 @@ import java.util.List;
 @Service
 public interface ItemService {
 
-    Item create(long userId, ItemDto itemDto);
+    ItemDto create(long userId, ItemDto itemDto);
 
-    Item update(long userId, long itemId, ItemDto itemDto);
+    ItemDto update(long userId, long itemId, ItemDto itemDto);
 
     ItemCommentBookingDto getById(long userId, long itemId);
 
-    List<ItemCommentBookingDto> getAllUsersItems(long userId);
+    List<ItemCommentBookingDto> getAllUsersItems(long userId, int from, int size);
 
-    List<Item> getAllByTextRequest(String request);
+    List<Item> getAllByTextRequest(String request, int from, int size);
 
     CommentDto createCommentToItem(long userId, long itemId, IncomingCommentDto incomingCommentDto);
 }
