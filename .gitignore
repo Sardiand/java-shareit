@@ -3,6 +3,9 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/main/**/META-INF/
+out/
+MANIFEST.MF
 
 ### STS ###
 .apt_generated
