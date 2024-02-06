@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.IncomingCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
@@ -33,7 +33,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") long userId,
                                              @PathVariable long itemId,
-                                             @Valid @RequestBody CommentDto commentDto) {
+                                             @Valid @RequestBody IncomingCommentDto commentDto) {
         return itemClient.addComment(userId, itemId, commentDto);
     }
 

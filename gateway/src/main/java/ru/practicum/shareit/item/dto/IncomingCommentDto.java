@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @Validated
-public class CommentDto {
+public class IncomingCommentDto {
     @NotBlank
     private String text;
 }
